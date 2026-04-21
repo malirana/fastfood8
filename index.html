@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Menu</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+
+    <header><h1>Food Junction 🍔</h1></header>
+
+    <div id="home-page" class="container">
+        <div class="menu-card">
+            <div class="info-area">
+                <h3>Pizza 🍕</h3>
+                <select id="pizza-size"><option value="Small">Small (600)</option><option value="Medium">Medium (1000)</option></select>
+            </div>
+            <div class="action-area">
+                <input type="number" id="qty-pizza" value="1" min="1">
+                <button onclick="addPizza()">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="menu-card">
+            <div class="info-area"><h3>Zinger Burger 🍔</h3><p>350 PKR</p></div>
+            <div class="action-area">
+                <input type="number" id="qty-burger" value="1" min="1">
+                <button onclick="addBurger()">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="menu-card">
+            <div class="info-area">
+                <h3>Chicken Strips 🍗</h3>
+                <select id="strips-size"><option value="6pcs">6 Pcs (400)</option><option value="12pcs">12 Pcs (750)</option></select>
+            </div>
+            <div class="action-area">
+                <input type="number" id="qty-strips" value="1" min="1">
+                <button onclick="addStrips()">Add to Cart</button>
+            </div>
+        </div>
+
+        <button id="view-cart-btn" onclick="showCart()">View Cart (0)</button>
+    </div>
+
+    <div id="cart-page" style="display:none;" class="container">
+        <header><button onclick="hideCart()" class="back-btn">←</button><h1>Checkout</h1></header>
+        <div id="cart-list" class="cart-items-list"></div>
+        <div id="cart-total" class="total-box">Total: 0 PKR</div>
+        <div class="checkout-form">
+            <input type="text" id="cust-name" placeholder="Name" class="input-field">
+            <input type="text" id="cust-address" placeholder="Address" class="input-field">
+            <input type="tel" id="cust-phone" placeholder="Phone" class="input-field">
+           <button onclick="sendOrderEmail()" class="checkout-btn">Confirm Order</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+    // 1. EmailJS Initialize (Apni Public Key yahan daalein)
+    emailjs.init("-960_vpGKJDxVAYKX"); 
+
+    // 2. Cart Logic
+    let cart = [];
+    const prices = { "Pizza": {"Small": 600, "Medium": 1000}, "Burger": 350, "Strips": {"6pcs": 400, "12pcs": 750} };
+
+    function addPizza() { addToCart("Pizza " + document.getElementById('pizza-size').value, prices.Pizza[document.getElementById('pizza-size').value], parseInt(document.getElementById('qty-pizza').value)); }
+    function addBurger() { addToCart("Zinger Burger", prices.Burger, parseInt(document.getElementById('qty-burger').value)); }
+    function addStrips() { addToCart("Strips " + document.getElementById('strips-size').value, prices.Strips[document.getElementById('strips-size').value], parseInt(document.getElementById('qty-strips').value)); }
+
+    function addToCart(name, price, qty) {
+        let item = cart.find(i => i.name === name);
+        if(item) item.qty += qty; else cart.push({name, price, qty});
+        updateViewCartButton();
+       
+    }
+
+    function updateViewCartButton() {
+        let count = cart.reduce((s, i) => s + i.qty, 0);
+        let btn = document.getElementById('view-cart-btn');
+        btn.innerText = `View Cart (${count})`;
+        btn.style.display = count > 0 ? 'block' : 'none';
+    }
+
+    // 3. UI Helper Functions
+    function showCart() { document.getElementById('home-page').style.display='none'; document.getElementById('cart-page').style.display='block'; renderCart(); }
+    function hideCart() { document.getElementById('home-page').style.display='block'; document.getElementById('cart-page').style.display='none'; }
+
+    function renderCart() {
+        let list = document.getElementById('cart-list');
+        let total = 0; list.innerHTML = "";
+        cart.forEach((item) => {
+            total += (item.price * item.qty);
+            list.innerHTML += `<div class="cart-row"><span>${item.name} (${item.qty}x)</span> <span>${item.price * item.qty} PKR</span></div>`;
+        });
+        document.getElementById('cart-total').innerText = "Total: " + total + " PKR";
+    }
+
+    // 4. EmailJS Function
+    function sendOrderEmail() {
+        let name = document.getElementById('cust-name').value;
+        let address = document.getElementById('cust-address').value;
+        let phone = document.getElementById('cust-phone').value;
+        
+        if(name=="" || address=="" || phone==""){
+            alert("Please saari details fill karein!"); 
+            return;
+        }
+
+        let orderItems = cart.map(i => `${i.name} (Qty: ${i.qty})`).join('\n');
+        let rawTotal = document.getElementById('cart-total').innerText;
+
+        let templateParams = {
+            name: name,
+            phone: phone,
+            address: address,
+            order_list: orderItems,
+            total_price: rawTotal
+        };
+
+        // Apni Service ID aur Template ID yahan daalein
+        emailjs.send("service_u5ozozp", "template_skxwwxt", templateParams)
+        .then(function(response) {
+            alert("Order Confirmed!");
+            location.reload(); // Page refresh ho jayega
+        }, function(error) {
+            alert("Error: Order nahi gaya, please check internet connection.");
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+* { box-sizing: border-box; font-family: sans-serif; }
+body { background: #f4f4f4; margin: 0; padding-bottom: 80px; }
+header { background: #ff4757; color: white; padding: 15px; text-align: center; }
+.container { padding: 10px; }
+
+/* Menu Card */
+.menu-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.info-area { margin-bottom: 10px; }
+.info-area h3 { margin: 0 0 5px 0; }
+.info-area select { width: 100%; padding: 8px; border: 1px solid #ddd; }
+
+/* The "Action Area" - Name, Qty, Button together */
+.action-area { display: flex; gap: 10px; align-items: center; }
+.action-area input { width: 60px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
+.action-area button { flex-grow: 1; padding: 10px; background: #ff4757; color: white; border: none; border-radius: 5px; font-weight: bold; }
+
+/* UI Fixes */
+#view-cart-btn { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: #27ae60; color: white; border: none; font-size: 18px; }
+.cart-row { display: flex; justify-content: space-between; padding: 10px; background: white; margin: 5px 0; border-radius: 5px; }
+.input-field { width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+.checkout-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 5px; font-size: 16px; }
